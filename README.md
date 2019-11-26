@@ -1,2 +1,4 @@
-# DAwR_ZIBI_2019
+# Data Analysis with R, 
+## ZIBI, Berlin 2019
+
 Scripts from workshop
