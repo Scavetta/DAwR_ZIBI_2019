@@ -63,17 +63,25 @@ ggplot(PlantGrowth, aes(sample = weight)) +
   stat_qq_line(color = "red") +
   facet_grid(. ~ group)
 
-sam <- 100
-myData <- data.frame(type = rep(c("Skew","Norm"), each = sam),
-                     x = c(rbeta(sam,2,10),rnorm(sam, 10)))
+# Extra example with QQ plots
+sam <- 1000
+myData <- data.frame(type = rep(c("Positive", 
+                                  "Negative", 
+                                  "Norm"), 
+                                each = sam),
+                     x = c(rnorm(sam)^2,
+                           log(rnorm(sam)),
+                           rnorm(sam)))
+
 ggplot(myData, aes(x = x)) +
-  geom_histogram() +
-  facet_wrap(type ~ ., scales = "free_x")
+  geom_histogram(aes(y = ..density..)) +
+  facet_wrap(type ~ ., scales = "free_x", ncol = 1)
 
 ggplot(myData, aes(sample = x)) +
   stat_qq() +
   stat_qq_line(color = "red") +
-  facet_grid(type ~ .)
+  facet_wrap(type ~ ., ncol = 1, scale = "free_y")
+
 
 # Inferential statistics ----
 # First, define a linear model:
@@ -310,4 +318,5 @@ typeof(PlantGrowth)
 dim(PlantGrowth) # 30 rows & 2 columns
 nrow(PlantGrowth) # 30
 ncol(PlantGrowth) # 2
+
 
