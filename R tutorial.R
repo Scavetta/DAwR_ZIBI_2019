@@ -319,4 +319,138 @@ dim(PlantGrowth) # 30 rows & 2 columns
 nrow(PlantGrowth) # 30
 ncol(PlantGrowth) # 2
 
+# Make a dataframe from scratch:
+foo.df <- data.frame(foo4, foo3, foo2)
+
+glimpse(foo.df)
+
+# Replace the names attribute with another character vector
+names(foo.df) <- myNames
+
+# Element 4: Logical Expressions ----
+# Asking and Combining Yes/No Questions
+# Relational operators for asking
+# == equivalency
+# != non-equivalency
+# >, <, >=, <=
+# !x, the negation of x, where x is a logical vector
+
+# Logical operators for combining
+# & AND - ALL results must be TRUE
+# | OR - at LEAST ONE result must be TRUE
+# %in% WITHIN - combine many == with |
+
+## ALWAYS 100% of the time get a LOGICAL VECTOR as output
+
+# examples using filter() from dplyr
+
+# using logical input
+# Find all observations where "healthy" is TRUE
+foo.df %>% 
+  filter(healthy)
+
+# All unhealthy observations
+foo.df %>% 
+  filter(!healthy)
+
+# using numeric input
+# All observations with quantity below 10
+foo.df %>% 
+  filter(quantity < 10)
+
+# between 10 and 20 (middle)
+foo.df %>% 
+  filter(quantity < 20 & quantity > 10)
+
+# short-cut for filter
+foo.df %>% 
+  filter(quantity < 20, quantity > 10)
+
+# Meaningless
+foo.df %>% 
+  filter(quantity < 20 | quantity > 10)
+
+# beyond 10 and 20 (tails)
+foo.df %>% 
+  filter(quantity < 10 | quantity > 20)
+
+# impossible
+foo.df %>% 
+  filter(quantity < 10 & quantity > 20)
+
+# using character input
+# NO PATTERN MATCHING HERE
+# All heart samples
+foo.df %>% 
+  filter(tissue == "Heart")
+
+# All liver and heart samples
+# good, but inefficient:
+foo.df %>% 
+  filter(tissue == "Heart" | tissue == "Liver")
+
+# The WORST way! NEVER do this!!
+foo.df %>% 
+  filter(tissue == c("Heart", "Liver"))
+foo.df %>% 
+  filter(tissue == c("Liver", "Heart"))
+
+# The best way:
+foo.df %>% 
+  filter(tissue %in% c("Heart", "Liver"))
+foo.df %>% 
+  filter(tissue %in% c("Liver", "Heart"))
+
+# All liver, intestine and heart samples
+foo.df %>% 
+  filter(tissue %in% c("Heart", "Liver", "Intestine"))
+
+# Element 5: Indexing ----
+# Finding info by position using []
+
+# Vectors (1 dimensional)
+foo1 # all values
+foo1[6] # the 6th value
+foo1[p] # the pth value
+foo1[length(foo1)] # the last value
+foo1[3:p] # the 3rd to the pth values
+foo1[p:length(foo1)] # the pth to the last value
+foo1[-1] # excluding the first value
+foo1[-(1:p)] # exclude 1st to pth values
+foo1[-1:-p] # exclude 1st to pth values
+foo1[-p:-(p+1)] # exclude p and the next value
+
+# We can use integers, plus objects and functions
+# that equate to integers
+
+# BUT!!! the exciting part is LOGICAL VECTORS
+# i.e. the result of logical expressions (see element 4)
+
+foo1[foo1 < 55] # all values lower than 55
+
+# Data frames (2-dimensional)
+# [ <rows> , <columns> ]
+foo.df[,3] # All rows, 3rd column
+foo.df[3,] # All columns, 3rd row
+
+foo.df[ foo.df$quantity < 10 , 2 ] # All tissues with low quantity (below 10)
+foo.df[ foo.df$quantity < 10 , "tissue" ] # All tissues with low quantity (below 10)
+
+# Notice the similarity to filter()
+foo.df %>% 
+  filter(quantity < 10) %>% 
+  select(tissue)
+
+
+# What if...
+foo.df[,3] # All rows, 3rd column
+foo.df[3] # Shortcut for all rows, 3rd column
+
+# make it a tibble:
+foo.df <- as_tibble(foo.df)
+foo.df
+
+# Now... these are always data frames:
+foo.df[,3] # All rows, 3rd column
+foo.df[3] # Shortcut for all rows, 3rd column
 
