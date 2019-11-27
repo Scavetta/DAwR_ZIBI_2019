@@ -11,7 +11,7 @@ library(tidyverse)
 
 # Exercise 8.1 (Import and Examine) ----
 # Import data:
-protein.df <- read.delim("Protein.txt")
+protein.df <- read.delim("Protein.txt", stringsAsFactors = FALSE)
 
 # Explore the data
 ncol(protein.df)
@@ -44,6 +44,12 @@ sum(protein.df$Contaminant == "+")/nrow(protein.df) * 100
 # Remove them?
 protein.df %>% 
   filter(Contaminant != "+") -> protein.df
+
+# plot the ratios (raw)
+ggplot(protein.df, aes(Ratio.H.M)) +
+  geom_density()
+
+
 
 # Exercise 8.2 (Clean-up and Transform) ----
 # Log10 transformation of the 3 intensity columns (H, M and L)

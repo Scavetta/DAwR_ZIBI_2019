@@ -17,7 +17,7 @@ n
 # The PlantGrowth dataset ----
 # A built-in dataset
 PlantGrowth
-
+foo
 # Explore our data
 summary(PlantGrowth)
 str(PlantGrowth)
@@ -453,4 +453,118 @@ foo.df
 # Now... these are always data frames:
 foo.df[,3] # All rows, 3rd column
 foo.df[3] # Shortcut for all rows, 3rd column
+
+# Element 6: Factor Variables (with levels) ----
+# aka Categorical, qualitative, discrete variables
+# Small and known number of groups
+
+# e.g. 
+PlantGrowth$group
+
+# type and class
+typeof(PlantGrowth$group)
+class(PlantGrowth$group)
+# factor is a special class of type integer
+
+# see this with str()
+str(PlantGrowth)
+
+# conversions:
+foo3
+foo.df$tissue
+
+# complications:
+test_factor <- c(21:30, "bob")
+test_factor # character
+
+myData <- data.frame(test_factor)
+myData$test_factor # now it's a factor
+
+# can't to math, because it's the wrong type
+mean(myData$test_factor)
+
+# typical solution is coercion
+as.numeric(myData$test_factor)
+# But these numbers don't match the actual data!!!
+# because you just get the mapping onto the levels
+
+# So to really coerce use:
+myData$test_factor <- as.numeric(as.character(myData$test_factor))
+# now you get the actual data
+
+# And you can do math on it:
+mean(myData$test_factor, na.rm = TRUE)
+
+# Element 7: Tidy Data with tidyr ----
+# begin with a play data set:
+source("PlayData.R")
+
+# To get tidy data, use gather() 
+# four args
+# 1 - data
+# 2,3 - names of the OUTPUT key-value pair
+# 4 - either the ID or the MEASURE variables
+
+# example specifying the ID vars (i.e. exclude using - )
+PlayData %>% 
+  gather(key, value, -c(type, time))
+
+# example specifying the MEASURE vars (i.e. including)
+PlayData_t <- gather(PlayData, key, value, c(height, width))
+
+# Scenario 1: Transformation across height and width
+# super easy, just use the messy data
+PlayData$height/PlayData$width
+
+# Scenario 2: Transformation across time 1 & 2
+# solution 1: get back to messy data
+# and use mutate() to apply a transformation function
+PlayData_t %>% 
+  spread(time, value) %>% 
+  mutate(diff = `2` - `1`)
+
+# What about, standardize each value for each type and key so that
+# time 1 is value 1
+PlayData_t %>% 
+  group_by(type, key) %>% 
+  mutate(standard = value/value[time == 1],
+         z_score = (value - mean(value))/sd(value))
+  
+# Scenario 3: Transformation across type A & B
+PlayData_t %>% 
+  spread(type, value) %>% 
+  mutate(ratio = A/B)
+
+# Element 8: Tidyverse with dplyr ----
+# (Split-Apply-Combine)
+# The pipe operator %>%,
+# The five verbs of dplyr:
+#   filter(),
+#   arrange(),
+#   select(),
+#   mutate(),
+#   summarise(), and
+# group_by()
+
+# Revisit PlayData_t
+# Scenario 1: Aggregration over height and width (i.e. key)
+PlayData_t %>% 
+  group_by(type, time) %>% 
+  summarise(avg = mean(value))
+
+# Scenario 2: Aggregration over time 1 & 2
+PlayData_t %>% 
+  group_by(type, key) %>% 
+  summarise(avg = mean(value), 
+            diff = value[time == 2] - value[time == 1], 
+            diff_2 = diff(value))
+
+# Scenario 3: Aggregration over type A & B
+PlayData_t %>% 
+  group_by(time, key) %>%
+  summarise(avg = mean(value), 
+            diff = value[type == "A"] - value[type == "B"],
+            diff_2 = diff(value))
+
+  
 
